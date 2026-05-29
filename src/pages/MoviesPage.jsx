@@ -2,7 +2,7 @@ import { useState } from "react";
 import { movies as initialMovies } from "../utils/movies";
 
 function MoviesPage() {
-    const [movies, setMovies] = useState(initialMovies);
+    const [movies, setMovies] = useState(initialMovies || []);
 
     const [form, setForm] = useState({
         title: "",
@@ -20,21 +20,17 @@ function MoviesPage() {
         });
     };
 
-    // CREATE
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!form.title.trim() || !form.director.trim()) {
-            alert("Title and Director are required!");
-            return;
-        }
+        if (!form.title || !form.director) return;
 
         const newMovie = {
             id: Date.now(),
             ...form,
         };
 
-        setMovies([...movies, newMovie]);
+        setMovies((prev) => [...prev, newMovie]);
 
         setForm({
             title: "",
@@ -44,119 +40,125 @@ function MoviesPage() {
         });
     };
 
-    // UPDATE (toggle watched)
     const toggleWatched = (id) => {
-        setMovies(
-            movies.map((movie) =>
-                movie.id === id
-                    ? { ...movie, watched: !movie.watched }
-                    : movie
+        setMovies((prev) =>
+            prev.map((m) =>
+                m.id === id ? { ...m, watched: !m.watched } : m
             )
         );
     };
 
-    // DELETE
     const deleteMovie = (id) => {
-        setMovies(movies.filter((movie) => movie.id !== id));
+        setMovies((prev) => prev.filter((m) => m.id !== id));
     };
 
     return (
-        <div className="p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">
-                Movies
+        <div className="min-h-screen bg-gray-100 p-10">
+            {/* HEADER */}
+            <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center">
+                🎬 Movie Watchlist
             </h1>
 
-            {/* FORM */}
+            {/* FORM CARD */}
             <form
                 onSubmit={handleSubmit}
-                className="mb-8 p-4 border rounded bg-white space-y-3"
+                className="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-lg space-y-4 mb-10"
             >
+                <h2 className="text-xl font-semibold text-gray-700">
+                    Add New Movie
+                </h2>
+
                 <input
-                    type="text"
                     name="title"
-                    placeholder="Title"
                     value={form.title}
                     onChange={handleChange}
-                    className="border p-2 w-full"
+                    placeholder="Movie Title"
+                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
                 <input
-                    type="text"
                     name="director"
-                    placeholder="Director"
                     value={form.director}
                     onChange={handleChange}
-                    className="border p-2 w-full"
+                    placeholder="Director"
+                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
                 <input
-                    type="text"
                     name="genre"
-                    placeholder="Genre"
                     value={form.genre}
                     onChange={handleChange}
-                    className="border p-2 w-full"
+                    placeholder="Genre"
+                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-gray-600">
                     <input
                         type="checkbox"
                         name="watched"
                         checked={form.watched}
                         onChange={handleChange}
+                        className="w-4 h-4"
                     />
-                    Watched
+                    Mark as watched
                 </label>
 
-                <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
-                >
-                    Add Movie
+                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    + Add Movie
                 </button>
             </form>
 
-            {/* MOVIES LIST */}
-            <div className="grid gap-4">
+            {/* MOVIE LIST */}
+            <div className="grid gap-6 max-w-5xl mx-auto">
                 {movies.map((movie) => (
                     <div
                         key={movie.id}
-                        className="p-4 border rounded-lg shadow-sm bg-white"
+                        className="bg-white rounded-2xl shadow-md p-5 hover:shadow-xl transition"
                     >
-                        <h2 className="text-xl font-semibold">
-                            {movie.title}
-                        </h2>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-800">
+                                    {movie.title}
+                                </h2>
 
-                        <p className="text-gray-700">
-                            <strong>Director:</strong>{" "}
-                            {movie.director}
-                        </p>
+                                <p className="text-gray-600">
+                                    🎬 {movie.director}
+                                </p>
 
-                        <p className="text-gray-700">
-                            <strong>Genre:</strong> {movie.genre}
-                        </p>
+                                <p className="text-gray-500">
+                                    🎭 {movie.genre}
+                                </p>
 
-                        <p className="text-gray-700">
-                            <strong>Watched:</strong>{" "}
-                            {movie.watched ? "Yes" : "No"}
-                        </p>
+                                <p
+                                    className={`mt-2 font-semibold ${
+                                        movie.watched
+                                            ? "text-green-600"
+                                            : "text-red-500"
+                                    }`}
+                                >
+                                    {movie.watched
+                                        ? "✔ Watched"
+                                        : "✖ Not Watched"}
+                                </p>
+                            </div>
+                        </div>
 
                         {/* ACTION BUTTONS */}
-                        <div className="flex gap-3 mt-3">
+                        <div className="flex gap-3 mt-4">
                             <button
                                 onClick={() =>
                                     toggleWatched(movie.id)
                                 }
-                                className="px-3 py-1 bg-green-600 text-white rounded"
+                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                             >
-                                Toggle Watched
+                                Toggle
                             </button>
 
                             <button
                                 onClick={() =>
                                     deleteMovie(movie.id)
                                 }
-                                className="px-3 py-1 bg-red-600 text-white rounded"
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                             >
                                 Delete
                             </button>
