@@ -20,10 +20,10 @@ function MoviesPage() {
         });
     };
 
+    // CREATE
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // validation
         if (!form.title.trim() || !form.director.trim()) {
             alert("Title and Director are required!");
             return;
@@ -36,13 +36,28 @@ function MoviesPage() {
 
         setMovies([...movies, newMovie]);
 
-        // reset form
         setForm({
             title: "",
             director: "",
             genre: "",
             watched: false,
         });
+    };
+
+    // UPDATE (toggle watched)
+    const toggleWatched = (id) => {
+        setMovies(
+            movies.map((movie) =>
+                movie.id === id
+                    ? { ...movie, watched: !movie.watched }
+                    : movie
+            )
+        );
+    };
+
+    // DELETE
+    const deleteMovie = (id) => {
+        setMovies(movies.filter((movie) => movie.id !== id));
     };
 
     return (
@@ -113,7 +128,8 @@ function MoviesPage() {
                         </h2>
 
                         <p className="text-gray-700">
-                            <strong>Director:</strong> {movie.director}
+                            <strong>Director:</strong>{" "}
+                            {movie.director}
                         </p>
 
                         <p className="text-gray-700">
@@ -124,6 +140,27 @@ function MoviesPage() {
                             <strong>Watched:</strong>{" "}
                             {movie.watched ? "Yes" : "No"}
                         </p>
+
+                        {/* ACTION BUTTONS */}
+                        <div className="flex gap-3 mt-3">
+                            <button
+                                onClick={() =>
+                                    toggleWatched(movie.id)
+                                }
+                                className="px-3 py-1 bg-green-600 text-white rounded"
+                            >
+                                Toggle Watched
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    deleteMovie(movie.id)
+                                }
+                                className="px-3 py-1 bg-red-600 text-white rounded"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
